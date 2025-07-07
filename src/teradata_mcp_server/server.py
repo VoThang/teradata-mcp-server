@@ -43,13 +43,16 @@ _tdconn = td.TDConn()
 
 #afm-defect:
 _enableEVS = False
+
 # Only attempt to connect to EVS is the system has an EVS installed/configured
-if (len(os.getenv("VS_NAME", "").strip()) > 0):
+if len(os.getenv("VS_NAME", "").strip()) > 0:
     try:
-        _evs    = td.evs()
+        _evs = td.evs.get_evs()
         _enableEVS = True
-    except:
-        logger.error("Unable to establish connection to EVS, disabling")
+        logger.info("Connection to Enterprise Vector Store is successful.")
+    except Exception as e:
+        logger.error(f"Unable to establish connection to EVS: {e}")
+
         
 #afm-defect: moved establish teradataml connection into main TDConn to enable auto-reconnect.
 #td.teradataml_connection()
@@ -504,17 +507,17 @@ async def sec_userRoles(
 
 #------------------ Enterprise Vectore Store Tools  ------------------#
 
-# @mcp.tool(description="Enterprise Vector Store similarity search")
-# async def vector_store_similarity_search(
-#     question: str = Field(description="Natural language question"),
-#     top_k: int = Field(1, description="top matches to return"),
-# ) -> ResponseType:
+@mcp.tool(description="Enterprise Vector Store similarity search")
+async def vector_store_similarity_search(
+    question: str = Field(description="Natural language question"),
+    top_k: int = Field(1, description="top matches to return"),
+) -> ResponseType:
 
-#     return execute_vs_tool(
-#         td.evs_tools.handle_evs_similarity_search,
-#         question=question,
-#         top_k=top_k,
-#     )
+    return execute_vs_tool(
+        td.evs_tools.handle_evs_similarity_search,
+        question=question,
+        top_k=top_k,
+    )
 
 
 
